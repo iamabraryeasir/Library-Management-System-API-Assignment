@@ -1,6 +1,6 @@
-import app from "./app";
-import config from "./config";
-import { connectToMongoDB } from "./config/db.config";
+import app from './app';
+import config from './app/config';
+import { connectToMongoDB } from './app/config/db.config';
 
 async function main() {
   try {
@@ -10,7 +10,7 @@ async function main() {
       console.log(`Server is running at port: ${config.port}`);
     });
   } catch (err) {
-    console.log("Error running the server!!", err);
+    console.log('Error running the server!!', err);
     process.exit(1);
   }
 }
