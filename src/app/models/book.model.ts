@@ -5,6 +5,7 @@ const bookSchema = new Schema<IBook>(
   {
     title: {
       type: String,
+      unique: [true, 'A Book already exist with this name'],
       required: [true, 'Book title is required'],
     },
     author: {
@@ -29,10 +30,12 @@ const bookSchema = new Schema<IBook>(
     },
     isbn: {
       type: String,
+      unique: [true, 'ISBN number must be unique'],
       required: [true, 'ISBN number is required'],
     },
     description: {
       type: String,
+      default: '',
     },
     copies: {
       type: Number,
