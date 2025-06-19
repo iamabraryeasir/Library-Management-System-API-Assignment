@@ -1,8 +1,9 @@
 // node modules
-import express from "express";
+import express from 'express';
 
 // local modules
-import appRouter from "./api";
+import appRouter from './api';
+import { errorHandler } from './middlewares/errorHandler.middleware';
 
 const app = express();
 
@@ -11,6 +12,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/v1", appRouter);
+app.use('/api/v1', appRouter);
+
+// global error handler
+app.use(errorHandler);
 
 export default app;
