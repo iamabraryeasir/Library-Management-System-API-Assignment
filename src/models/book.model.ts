@@ -13,6 +13,7 @@ const bookSchema = new Schema<IBook>(
     },
     genre: {
       type: String,
+      uppercase: true,
       enum: {
         values: [
           'FICTION',
