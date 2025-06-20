@@ -142,3 +142,32 @@ export async function updateBook(
     next(err);
   }
 }
+
+export async function deleteBook(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { bookId } = req.params;
+
+    const book = await Book.findByIdAndDelete(bookId);
+
+    if (!book) {
+      res.status(404).json({
+        success: false,
+        message: 'Book not found',
+        data: null,
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Book deleted successfully',
+      data: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
