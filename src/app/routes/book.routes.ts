@@ -1,9 +1,14 @@
 import { Router } from 'express';
-import { createBook, getAllBooks } from '../controllers/book.controller';
+import {
+  createBook,
+  getAllBooks,
+  getBookById,
+} from '../controllers/book.controller';
 
 const router = Router();
 
-router.get('/', getAllBooks);
 router.post('/', createBook);
+router.get('/', getAllBooks);
+router.get('/:bookId', getBookById);
 
 export default router;

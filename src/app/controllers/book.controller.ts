@@ -57,7 +57,7 @@ export async function getAllBooks(
 
       if (parseInt(limitValue) > 0) {
         limit = parseInt(limitValue);
-      } 
+      }
     }
 
     // query for getting the books
@@ -67,6 +67,33 @@ export async function getAllBooks(
       success: true,
       message: 'Books retrieved successfully',
       data: books,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getBookById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { bookId } = req.params;
+
+    const book = await Book.findById(bookId);
+
+    if (!book) {
+      res.status(404).json({
+        success: false,
+        message: 'No book found with this Id',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Book retrieved successfully',
+      data: book,
     });
   } catch (err) {
     next(err);
