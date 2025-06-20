@@ -58,3 +58,51 @@ export async function borrowBook(
     next(err);
   }
 }
+
+export async function getBorrowBookDetails(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const borrowBookData = await Borrow.aggregate([
+      {
+        $group: {
+          _id: '$book',
+          totalQuantity: {
+            $sum: '$quantity',
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'books',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'bookInfo',
+        },
+      },
+      {
+        $unwind: '$bookInfo',
+      },
+      {
+        $project: {
+          _id: 0,
+          book: {
+            title: '$bookInfo.title',
+            isbn: '$bookInfo.isbn',
+          },
+          totalQuantity: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Borrowed books summary retrieved successfully',
+      data: borrowBookData,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
