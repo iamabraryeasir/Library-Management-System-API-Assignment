@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 
 import bookRouter from './app/routes/book.routes';
+import borrowRouter from './app/routes/borrow.routes';
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.get('/', (req: Request, res: Response) => {
 
 // other routes
 router.use('/books', bookRouter);
+router.use('/borrow', borrowRouter);
 
 export default router;
