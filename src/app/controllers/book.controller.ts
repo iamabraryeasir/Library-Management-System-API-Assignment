@@ -99,3 +99,46 @@ export async function getBookById(
     next(err);
   }
 }
+
+export async function updateBook(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { bookId } = req.params;
+    const requestBody = req.body;
+
+    const ALLOWED_FIELDS_FOR_UPDATE = [
+      'title',
+      'author',
+      'genre',
+      'isbn',
+      'description',
+      'copies',
+      'available',
+    ];
+
+    const payload: Partial<IBook> = {};
+
+    for (const key in requestBody) {
+      if (ALLOWED_FIELDS_FOR_UPDATE.includes(key)) {
+        payload[key as keyof IBook] = requestBody[key];
+      }
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+      bookId,
+      { $set: payload },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Book updated successfully',
+      data: updatedBook,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
