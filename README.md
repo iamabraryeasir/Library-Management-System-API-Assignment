@@ -288,6 +288,8 @@ There are 2 main endpoint groups:
 
 ## 🏃‍♂️ Run Locally
 
+Run the following command to get the code locally.
+
 ```bash
 git clone https://github.com/your-username/library-management-api.git
 cd library-management-api
