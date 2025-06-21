@@ -1,7 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
+import * as z from 'zod/v4';
 
 import Book from '../models/book.model';
 import Borrow from '../models/borrow.model';
+
+//zod book validator
+const BorrowBookZod = z.object({
+  book: z.string().trim().min(1, 'Book is required'),
+  quantity: z.number().int().min(1, 'Quantity must be at least 1'),
+  dueDate: z.string().min(1, 'Due date is required'),
+});
 
 export async function borrowBook(
   req: Request,
@@ -9,18 +17,14 @@ export async function borrowBook(
   next: NextFunction
 ) {
   try {
-    // getting data from req body
-    const { book, quantity, dueDate } = req.body;
-
-    // validate
-    if (!book?.trim() || !quantity || !dueDate) {
-      res.status(400).json({
-        success: false,
-        message: 'Book, quantity, and dueDate are required',
-        data: null,
-      });
+    // validate using zod
+    const zodParseResult = BorrowBookZod.safeParse(req.body);
+    if (!zodParseResult.success) {
+      next(zodParseResult.error);
       return;
     }
+
+    const { book, quantity, dueDate } = zodParseResult.data;
 
     // getting book data for business logic
     const foundBook = await Book.findById(book).select('_id available copies');
@@ -45,7 +49,9 @@ export async function borrowBook(
     // deduct the quantity from book and update available
     if (foundBook) {
       foundBook.copies -= quantity;
-      foundBook.updateAvailability();
+      if (typeof foundBook.updateAvailability === 'function') {
+        foundBook.updateAvailability();
+      }
       await foundBook.save();
     }
 
