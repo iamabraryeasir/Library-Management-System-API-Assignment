@@ -1,15 +1,32 @@
 import { NextFunction, Request, Response } from 'express';
 import Book from '../models/book.model';
-import { IBook } from '../interfaces/book.interface';
+import { IBook, GenreEnum } from '../interfaces/book.interface';
+import * as z from 'zod/v4';
 
+// zod book validator
+const BookZod = z.object({
+  title: z.string(),
+  author: z.string(),
+  genre: z.enum(GenreEnum),
+  isbn: z.string(),
+  description: z.string().optional(),
+  copies: z.number(),
+  available: z.boolean(),
+});
+
+// controllers
 export async function createBook(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    // receiving data from req body
-    const body: IBook = req.body;
+    const validationResult = BookZod.safeParse(req.body);
+    if (!validationResult.success) {
+      next(validationResult.error);
+      return;
+    }
+    const body: IBook = validationResult.data;
 
     // saving data to db
     const newBook = await Book.create(body);
@@ -88,6 +105,7 @@ export async function getBookById(
         success: false,
         message: 'No book found with this Id',
       });
+      return;
     }
 
     res.status(200).json({
@@ -107,25 +125,14 @@ export async function updateBook(
 ) {
   try {
     const { bookId } = req.params;
-    const requestBody = req.body;
 
-    const ALLOWED_FIELDS_FOR_UPDATE = [
-      'title',
-      'author',
-      'genre',
-      'isbn',
-      'description',
-      'copies',
-      'available',
-    ];
-
-    const payload: Partial<IBook> = {};
-
-    for (const key in requestBody) {
-      if (ALLOWED_FIELDS_FOR_UPDATE.includes(key)) {
-        payload[key as keyof IBook] = requestBody[key];
-      }
+    // Validate only allowed fields, partial update
+    const validationResult = BookZod.partial().safeParse(req.body);
+    if (!validationResult.success) {
+      next(validationResult.error);
+      return;
     }
+    const payload: Partial<IBook> = validationResult.data;
 
     const updatedBook = await Book.findByIdAndUpdate(
       bookId,
