@@ -95,12 +95,14 @@ export async function getAllBooks(
     res.status(200).json({
       success: true,
       message: 'Books retrieved successfully',
-      data: books,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+      data: {
+        books,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
       },
     });
   } catch (err) {
