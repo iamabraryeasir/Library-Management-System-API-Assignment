@@ -67,23 +67,41 @@ export async function getAllBooks(
       }
     }
 
-    // logic for limit
+    // logic for limit and page (pagination)
     let limit: number = 10;
     if (req.query?.limit) {
       const limitValue = req.query?.limit as string;
-
       if (parseInt(limitValue) > 0) {
         limit = parseInt(limitValue);
       }
     }
 
+    let page: number = 1;
+    if (req.query?.page) {
+      const pageValue = req.query?.page as string;
+      if (parseInt(pageValue) > 0) {
+        page = parseInt(pageValue);
+      }
+    }
+
+    const skip = (page - 1) * limit;
+
     // query for getting the books
-    const books = await Book.find(filter).sort(sort).limit(limit);
+    const books = await Book.find(filter).sort(sort).skip(skip).limit(limit);
+
+    // get total count for pagination meta
+    const total = await Book.countDocuments(filter);
 
     res.status(200).json({
       success: true,
       message: 'Books retrieved successfully',
       data: books,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (err) {
     next(err);
