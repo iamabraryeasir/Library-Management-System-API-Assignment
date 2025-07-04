@@ -11,7 +11,10 @@ const app = express();
 // middlewares
 app.use(
   cors({
-    origin: ['http://localhost:5173'],
+    origin: [
+      'http://localhost:5173',
+      'https://library-management-system-frontend-three.vercel.app',
+    ],
   })
 );
 app.use(express.json());
